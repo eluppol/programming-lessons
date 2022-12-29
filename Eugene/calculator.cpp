@@ -5,16 +5,16 @@ using namespace std;
 
 int main()
 {
-    cout<<"Введите число: ";
+    cout<<"Enter number x: ";
     int x;
     cin>>x;
     
-    cout<<"Введите второе число: ";
+    cout<<"Enter number y: ";
     int y;
     cin>>y;
     
     char op;
-    cout<<"Введите операцию: ";
+    cout<<"Enter operation: ";
     cin>>op;
     
     int r;
