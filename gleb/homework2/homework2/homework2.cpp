@@ -85,6 +85,30 @@ int main()
 			typestreet = "road";
 		}
 	}
+	if (strname == 'a')
+	{
+		price = price + 2048;
+	}
+	if (strname == 'o')
+	{
+		price = price + 2048;
+	}
+	if (strname == 'e')
+	{
+		price = price + 2048;
+	}
+	if (strname == 'i')
+	{
+		price = price + 2048;
+	}
+	if (strname == 'u')
+	{
+		price = price + 2048;
+	}
+	if (strname == 'y')
+	{
+		price = price + 2048;
+	}
 	cout << "Hi, you live on  " << strname << typestreet << " and have a house with " << rooms << " bedrooms and  " << sqrtm << " square meters. " << endl;
 	cout << " Average temperature in July is " << temperature << "." << endl;
 	cout << "Your home " << cond << " air conditioning. " << endl;
