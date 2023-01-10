@@ -3,104 +3,96 @@
 #include <vector>
 #include <cmath>
 
+
 using namespace std;
 
-struct Pair
-{
-    int number = 0;
-    int numOfDigits = 0;
-};
 
-bool isValid(string checkedString)
+int isNumber(string &exp, string::iterator & it)
 {
-    if (checkedString[0] == '+' || checkedString[0] == '*' || checkedString[0] == '/')
-        return false;
+    vector<int> digits;
+    int number = 0;
+    
+    for (; it != exp.end(); ++it)
+    {
+        if (*it >= '0' && *it <= '9')
+            digits.push_back(*it - '0');
+        else
+            break;
+    }
+    while (digits.size())
+    {
+        number += *digits.begin() * pow(10, digits.size() - 1);
+        digits.erase(digits.begin());
+    }
+    return number;
+}
+
+double CountResult(vector<int> &numbers, vector<char> &operations)
+{
+    if (numbers.size() == operations.size())
+    {
+        numbers[0] = numbers[0] * -1;
+        operations.erase(operations.begin());
+    }
+    double result = numbers[0];
+    numbers.erase(numbers.begin());
     int i;
-    int size = checkedString.size();
+    int size = numbers.size();
     for (i = 0; i < size; i++)
     {
-        if (checkedString[i] != '0' || checkedString[i] != '1' || checkedString[i] != '2' || checkedString[i] != '3' || 
-            checkedString[i] != '4' || checkedString[i] != '5' || checkedString[i] != '6' || checkedString[i] != '7' || 
-            checkedString[i] != '8' || checkedString[i] != '9' || checkedString[i] != '*' || checkedString[i] != '/' || 
-            checkedString[i] != '-' || checkedString[i] != '+' )
+        if (operations[i] == '+')
+            result += numbers[i];
+        else if (operations[i] == '-')
+            result -= numbers[i];
+        else if (operations[i] == '*')
+            result *= numbers[i];
+        else if (!numbers[i])
+            result /= numbers[i];
+        else
         {
-            cout << "This expression was declined! Invalid symbol(s)" << endl;
-            return false;
+            cout << endl << "Dividing by 0. Donkey's mistake!!! Good bye... ";
+            return 0;
         }
     }
-    cout << "Expression has been accepted!" << endl;
-    return true;
+    return result;
 }
 
-Pair getNumber(Pair pair, string expression, int pos)
-{
-    vector<int> numbers;
-    while (expression[pos] != '+' || expression[pos] != '-' || expression[pos] != '/' || expression[pos] != '*' || expression[pos] != '\0')
-    {
-        numbers.push_back(expression[pos] - '0');
-        pos++;
-    }
-    int i = 0;
-    pair.numOfDigits = numbers.size();
-    while (numbers.size() > 0)
-        pair.number = pair.number + numbers[i] * pow(10, numbers.size() - 1);
-    return pair;
-}
-
-void printExpAndCountRes(vector<int> nums, vector<char> signs)
-{
-    double res = nums[0];
-    cout << "Expression" << nums[0];
-    nums.erase(nums.begin());
-    int i = 0;
-    while (i < signs.size())
-    {
-        cout << signs[i] << nums[i];
-        if (signs[i] == '+')
-            res += nums[i];
-        else if (signs[i] == '-')
-            res -= nums[i];
-        else if (signs[i] == '/' && nums[i + 1] != 0)
-            res /= nums[i];
-        else if (signs[i] == '*')
-            res *= nums[i];
-        i++;
-    }
-    cout << "=" << res << endl;
-}
 
 int main()
 {
     string expression;
     cout << "Enter the expression: ";
     getline(cin, expression);
-    if (isValid(expression))
-        cout << "Your expression: " << expression;
+    if (!((expression[0] >= '0' && expression[0] <= '9') || expression[0] == '-'))
+    {
+        cout << endl << "INVALID EXPRESSION!";
+        return false;
+    }
     int size = expression.size();
     int i;
     vector<int> numbers;
     vector<char> signs;
-    Pair tmp;
-    for (i = 0; i < size; i++)
+    string::iterator it;
+    string::iterator prev;
+    for (it = expression.begin(); it != expression.end(); ++it)
     {
-        if (expression[i] == '0' || expression[i] == '1' || expression[i] == '2' || expression[i] == '3' || expression[i] == '4' ||
-            expression[i] == '5' || expression[i] == '6' || expression[i] == '7' || expression[i] == '8' || expression[i] == '9' ||
-            (expression[0] == '-' && (expression[1] == '1' || expression[1] == '2' || expression[1] == '3' || expression[1] == '4' || 
-            expression[1] == '5' || expression[1] == '6' || expression[1] == '7' || expression[1] == '8' || expression[1] == '9')))
+        if (*it >= '0' && *it <= '9')
         {
-            tmp = getNumber(tmp, expression, i);
-            numbers.push_back(tmp.number);
-            i = i + tmp.numOfDigits - 1;
+            prev = it;
+            numbers.push_back(isNumber(expression, it));
+            it--;
         }
-        else if (expression[i] == '-' || expression[i] == '+' || expression[i] == '/' || expression[i] == '*' && (expression[i+1] != '-' ||
-            expression[i + 1] != '+' || expression[i + 1] != '-' || expression[i + 1] != '/' || expression[i + 1] != '*' || expression[i + 1] != '\0'))
-            signs.push_back(expression[i]);
+        else if (*it == '+' || *it == '-' || *it == '*' || *it == '/')
+        {
+            if (*prev == '+' || *prev == '-' || *prev == '*' || *prev == '/')
+                return 0;
+            prev = it;
+            signs.push_back(*it);
+        }
         else
-        {
-            cout << "Invalid expression! Stop it!!!" << endl;
             return 0;
-        }
- 
     }
+    double result = CountResult(numbers, signs);
+    cout << expression << " = " << result;
     return 0;
 }
