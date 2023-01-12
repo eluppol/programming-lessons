@@ -8,17 +8,18 @@ int main()
     string secondWord;
     cout<<"Please enter a string: ";
     getline(cin, phrase);
-    int firstPos = phrase.find(' ', 0);
-    int secondPos = phrase.find(' ', firstPos+1);
-    if(phrase.find(' ', 0)==-1 && phrase.find('.', 0)==-1 && 
-       phrase.find(',', 0)==-1 && phrase.find(':', 0)==-1 && 
-       phrase.find(';', 0)==-1 && phrase.find('-', 0)==-1 )
+    int firstPos = phrase.find_first_of(" ,.;:-", 0);
+    int secondPos = phrase.find_first_not_of(" ,.;:-", firstPos);
+    int threePos = phrase.find_first_of(" ,.;:-", secondPos);
+    if(phrase.find_first_not_of(" ,.;:-", firstPos)==-1)
     {
     cout<<"Error! your string has only 1 word"<<endl;
+    return 0;
     }
-    int numberCharSecWord = secondPos- firstPos;
-    secondWord = phrase.substr( firstPos+1, numberCharSecWord);
+    int numberCharSecWord = threePos- secondPos;
+    secondWord = phrase.substr( secondPos, numberCharSecWord);
     cout<<secondWord<<endl;
     
 return 0;
 }
+
