@@ -59,14 +59,15 @@ int main()
             for (i = 0; i < aSize && i < bSize && i < N; i++)
             {
                 if (a[i] > b[i])
-                    return b < a;
+                    return false;
                 else if (a[i] < b[i])
-                    return a < b;
+                    return true;
             }
             if (aSize > bSize)
-                return b < a;
+                return false;
             else if (aSize < bSize)
-                return a < b;
+                return true;
+            return true;
         });
     vector<string>::iterator it;
     for (it = words.begin(); it != words.end(); it++)
