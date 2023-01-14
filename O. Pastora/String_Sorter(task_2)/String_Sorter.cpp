@@ -8,29 +8,83 @@
 
 using namespace std;
 
+unsigned int N;
+
+struct SignsAndPos
+{
+    string signs;
+    int wordsBefore;
+};
+
 vector<string> GetOutWords(string sentence)
 {
-    int i;
+    unsigned int i;
     vector<string> words;
     string word;
-    int prevSpacePos;
-    for (i = 0; i < sentence.size(); i++)
+    unsigned int size = sentence.size();
+    unsigned int startPos;
+    unsigned int endPos;
+    for (i = 0; i < size; i++)
     {
-        prevSpacePos = sentence.find(' ', i);
-        word = sentence.substr(i, prevSpacePos - i);
-        words.push_back(word);
-        i = prevSpacePos;
-        if (sentence.find(' ', i + 1) == -1)
-        {
-            word = sentence.substr(i + 1, sentence.size() - prevSpacePos + 1);
-            words.push_back(word);
+        startPos = sentence.find_first_not_of(" ,.;:-", i);
+        endPos = sentence.find_first_of(" ,.;:-", startPos);
+        words.push_back(sentence.substr(startPos, endPos - startPos));
+        i = endPos;
+        if (sentence.find_first_not_of(" ,.;:-", i) == string::npos)
             return words;
-        }
     }
     return words;
 }
 
-unsigned int N;
+vector<SignsAndPos> GetOutSigns(string sentence)
+{
+    int i;
+    int size = sentence.size();
+    SignsAndPos signsBtwnWords;
+    vector<SignsAndPos> signs;
+    int posOfNextWord = 0;
+    int wordsFore = 0;
+    if (sentence.find_first_of(" ,.;:-", 0) == 0)
+    {
+        posOfNextWord = sentence.find_first_not_of(" ,.;:-", 0);
+        signsBtwnWords.signs = sentence.substr(0, posOfNextWord);
+        signsBtwnWords.wordsBefore = wordsFore;
+        signs.push_back(signsBtwnWords);
+    }
+    int posOfSignsBegin;
+    for (i = posOfNextWord; i < size; i = posOfNextWord)
+    {
+        posOfSignsBegin = sentence.find_first_of(" ,.;:-", i);
+        if (posOfSignsBegin != string::npos)
+        {
+            wordsFore++;
+            posOfNextWord = sentence.find_first_not_of(" ,.;:-", posOfSignsBegin);
+            signsBtwnWords.signs = sentence.substr(posOfSignsBegin, posOfNextWord - posOfSignsBegin);
+            signsBtwnWords.wordsBefore = wordsFore;
+            signs.push_back(signsBtwnWords);
+        }
+        else
+            return signs;
+    }
+    return signs;
+}
+
+void PrintSortedSentence(vector<string> words, vector<SignsAndPos> signs)
+{
+    vector<string>::iterator itW;
+    vector<SignsAndPos>::iterator itS;
+    if (signs[0].wordsBefore == 0)
+    {
+        cout << signs[0].signs;
+        signs.erase(signs.begin());
+    }   
+    for (itW = words.begin(), itS = signs.begin(); itW != words.end() && itS != signs.end(); itW++, itS++)
+        cout << *itW << (*itS).signs;
+    if (words.size() > signs.size())
+    {
+        cout << *(--words.end());
+    }
+}
 
 int main()
 {
@@ -45,17 +99,18 @@ int main()
         cout << "This string is empty!";
         return 0;
     }
-    else if (stringToSort.find(' ', 0) == -1)
+    else if (stringToSort.find_first_of(" ,.;:-", 0) == string::npos)
     {
         cout << "There is only one word in this string!";
         return 0;
     }
     vector<string> words = GetOutWords(stringToSort);
+    vector<SignsAndPos> signs = GetOutSigns(stringToSort);
     sort(words.begin(), words.end(), [](string a, string b)
         {
-            int i;
-            int aSize = a.size();
-            int bSize = b.size();
+            unsigned int i;
+            unsigned int aSize = a.size();
+             unsigned int bSize = b.size();
             for (i = 0; i < aSize && i < bSize && i < N; i++)
             {
                 if (a[i] > b[i])
@@ -63,18 +118,14 @@ int main()
                 else if (a[i] < b[i])
                     return true;
             }
-            if (aSize > bSize)
+            if (aSize >= bSize)
                 return false;
-            else if (aSize < bSize)
+            else
                 return true;
-            return true;
         });
-    vector<string>::iterator it;
-    for (it = words.begin(); it != words.end(); it++)
-        cout << *it << " ";
+    PrintSortedSentence(words, signs);
     return 0;
 }
-
 
 
 // Запуск программы: CTRL+F5 или меню "Отладка" > "Запуск без отладки"
