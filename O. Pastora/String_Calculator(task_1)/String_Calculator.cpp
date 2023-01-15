@@ -27,13 +27,56 @@ int isNumber(string &exp, string::iterator & it)
     return number;
 }
 
-double CountResult(vector<int> &numbers, vector<char> &operations)
+vector<double> MultAndDivide(vector<double>& numbers, vector<char> operations)
 {
+    int i;
+    int j;
+    vector<double>::iterator itN;
+    vector<char>::iterator itS;
+    for (i = 0, j = 0; i < operations.size(); )
+    {
+        if (operations[i] == '*')
+        {
+            numbers[j] *= numbers[j + 1];
+            itN = numbers.begin() + j + 1;
+            numbers.erase(itN);
+            itS = operations.begin() + i;
+            operations.erase(itS);
+        }
+        else if (operations[i] == '/')
+        {
+            if (numbers[j + 1])
+            {
+                numbers[j] /= numbers[j + 1];
+                itN = numbers.begin() + j + 1;
+                numbers.erase(itN);
+                itS = operations.begin() + i;
+                operations.erase(itS);
+            }
+            else
+            {
+                cout << "Dividing by 0!!!";
+                EXIT_FAILURE;
+            }
+        }
+        else
+        {
+            i++;
+            j++;
+        }
+    }
+    return numbers;
+}
+
+double CountResult(vector<double> numbers, vector<char> operations)
+{
+
     if (numbers.size() == operations.size())
     {
         numbers[0] = numbers[0] * -1;
         operations.erase(operations.begin());
     }
+    numbers = MultAndDivide(numbers, operations);
     double result = numbers[0];
     numbers.erase(numbers.begin());
     int i;
@@ -42,17 +85,8 @@ double CountResult(vector<int> &numbers, vector<char> &operations)
     {
         if (operations[i] == '+')
             result += numbers[i];
-        else if (operations[i] == '-')
-            result -= numbers[i];
-        else if (operations[i] == '*')
-            result *= numbers[i];
-        else if (!numbers[i])
-            result /= numbers[i];
         else
-        {
-            cout << endl << "Dividing by 0. Donkey's mistake!!! Good bye... ";
-            return 0;
-        }
+            result -= numbers[i];
     }
     return result;
 }
@@ -69,12 +103,17 @@ int main()
         return false;
     }
     int size = expression.size();
-    int i;
-    vector<int> numbers;
+    vector<double> numbers;
     vector<char> signs;
-    string::iterator it;
+    string::iterator it = expression.begin();
     string::iterator prev;
-    for (it = expression.begin(); it != expression.end(); ++it)
+    if (*it == '-')
+    {   
+        signs.push_back(*it);
+        prev = it;
+        it++;
+    }
+    for (it; it != expression.end(); it++)
     {
         if (*it >= '0' && *it <= '9')
         {
@@ -86,12 +125,14 @@ int main()
         {
             if (*prev == '+' || *prev == '-' || *prev == '*' || *prev == '/')
                 return 0;
-            prev = it;
-            signs.push_back(*it);
+            else
+                prev = it;
+                signs.push_back(*it);
         }
         else
             return 0;
     }
+
     double result = CountResult(numbers, signs);
     cout << expression << " = " << result;
     return 0;
