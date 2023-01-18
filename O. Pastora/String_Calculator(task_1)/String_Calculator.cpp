@@ -27,13 +27,13 @@ int isNumber(string &exp, string::iterator & it)
     return number;
 }
 
-vector<double> MultAndDivide(vector<double>& numbers, vector<char> operations)
+vector<double> MultAndDivide(vector<double>& numbers, vector<char>& operations)
 {
     int i;
     int j;
     vector<double>::iterator itN;
     vector<char>::iterator itS;
-    for (i = 0, j = 0; i < operations.size(); )
+    for (i = 0, j = 0; i < operations.size();)
     {
         if (operations[i] == '*')
         {
